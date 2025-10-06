@@ -7,7 +7,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.LocalDate
+import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
 import org.guilhermebauer.habit_tracker_mobile.habit.data.Habit
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -30,7 +36,11 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit) {
 
     var habitName by remember { mutableStateOf("") }
     var habitDescription by remember { mutableStateOf("") }
-    var habitFrequency by remember { mutableStateOf("Daily") }
+    var startDate by remember { mutableStateOf(LocalDate(2025, 1, 1)) }
+    var endDate by remember { mutableStateOf<LocalDate?>(null) }
+    var frequencyType by remember { mutableStateOf(FrequencyType.DAILY) }
+    var isExpanded by remember { mutableStateOf(false) }
+    var frequencyOptions = FrequencyType.entries.toList()
 
     Scaffold(
         topBar = {
@@ -68,7 +78,44 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit) {
 
             )
 
-            Text("Frequency: $habitFrequency", Modifier.padding(bottom = 16.dp))
+            Text("Start Date: ${startDate.toString()}")
+
+            ExposedDropdownMenuBox(
+                expanded = isExpanded,
+                onExpandedChange = {isExpanded = it},
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                ){
+
+                OutlinedTextField(
+                    value = frequencyType.name,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = {Text("Frequency")},
+                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) })
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                ExposedDropdownMenu(
+                    expanded = isExpanded,
+                    onDismissRequest = {isExpanded = false}
+                ){
+                    frequencyOptions.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = {Text(selectionOption.name)},
+                            onClick = {frequencyType = selectionOption
+                                isExpanded = false},
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+
+
+                        )
+                    }
+                }
+
+
+
+
+            }
 
             Spacer(Modifier.weight(1f))
 
@@ -79,7 +126,9 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit) {
                         val newHabit = Habit(
                             name = habitName,
                             description = habitDescription,
-                            frequency = habitFrequency
+                            startDate = startDate,
+                            endDate = endDate,
+                            frequencyType = frequencyType
                         )
                         onSaveHabit(newHabit)
                     }
