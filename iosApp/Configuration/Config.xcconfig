@@ -1,0 +1,7 @@
+TEAM_ID=
+
+PRODUCT_NAME=HabitTrackerMobile
+PRODUCT_BUNDLE_IDENTIFIER=org.guilhermebauer.habit_tracker_mobile.HabitTrackerMobile$(TEAM_ID)
+
+CURRENT_PROJECT_VERSION=1
+MARKETING_VERSION=1.0
