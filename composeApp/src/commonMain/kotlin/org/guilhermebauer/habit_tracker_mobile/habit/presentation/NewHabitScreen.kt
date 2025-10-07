@@ -7,15 +7,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,31 +27,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
 import org.guilhermebauer.habit_tracker_mobile.habit.data.Habit
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-@OptIn(ExperimentalMaterial3Api::class)
-fun NewHabitScreen(onSaveHabit: (Habit) -> Unit) {
-
+fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {}) {
     var habitName by remember { mutableStateOf("") }
     var habitDescription by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf(LocalDate(2025, 1, 1)) }
+    var isDatePickerVisible by remember { mutableStateOf(false) }
     var endDate by remember { mutableStateOf<LocalDate?>(null) }
     var frequencyType by remember { mutableStateOf(FrequencyType.DAILY) }
     var isExpanded by remember { mutableStateOf(false) }
-    var frequencyOptions = FrequencyType.entries.toList()
+    val frequencyOptions = FrequencyType.entries.toList()
+
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = null)
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Create New Habit") })
-
-        }) {
-
-            paddingValues ->
+        topBar = { TopAppBar(title = { Text("Create New Habit") }) }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -61,9 +66,10 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit) {
                 value = habitName,
                 onValueChange = { habitName = it },
                 label = { Text("Habit Name") },
-                placeholder = { Text("E.g., Drink Water") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
             )
 
             OutlinedTextField(
@@ -73,55 +79,95 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit) {
                 placeholder = { Text("What is your goal?") },
                 minLines = 3,
                 maxLines = 5,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            OutlinedTextField(
+                value = startDate.toString(),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Start date") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
 
             )
 
-            Text("Start Date: ${startDate.toString()}")
+
+            Button(onClick = { isDatePickerVisible = true }, modifier = Modifier.fillMaxWidth()) {
+                Text("Abrir calendário")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (isDatePickerVisible) {
+                DatePickerDialog(
+                    onDismissRequest = { isDatePickerVisible = false },
+                    confirmButton = {
+                        Button(onClick = {
+                            val selectedMillis = datePickerState.selectedDateMillis
+                            if (selectedMillis != null) {
+                                startDate = Instant.fromEpochMilliseconds(selectedMillis)
+                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                            }
+                            isDatePickerVisible = false
+                        }) { Text("OK") }
+                    },
+                    dismissButton = {
+                        Button(onClick = { isDatePickerVisible = false }) { Text("Cancel") }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
+
+
 
             ExposedDropdownMenuBox(
                 expanded = isExpanded,
-                onExpandedChange = {isExpanded = it},
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-                ){
-
+                onExpandedChange = { isExpanded = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
                 OutlinedTextField(
                     value = frequencyType.name,
                     onValueChange = {},
                     readOnly = true,
-                    label = {Text("Frequency")},
-                    modifier = Modifier.fillMaxWidth().menuAnchor(),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) })
+                    label = { Text("Frequency") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) }
+                )
 
-                Spacer(modifier = Modifier.height(8.dp))
 
                 ExposedDropdownMenu(
                     expanded = isExpanded,
-                    onDismissRequest = {isExpanded = false}
-                ){
+                    onDismissRequest = { isExpanded = false }
+                ) {
                     frequencyOptions.forEach { selectionOption ->
                         DropdownMenuItem(
-                            text = {Text(selectionOption.name)},
-                            onClick = {frequencyType = selectionOption
-                                isExpanded = false},
+                            text = { Text(selectionOption.name) },
+                            onClick = {
+                                frequencyType = selectionOption
+                                isExpanded = false
+                            },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-
-
                         )
                     }
                 }
-
-
-
-
             }
 
             Spacer(Modifier.weight(1f))
 
             Button(
                 onClick = {
-
                     if (habitName.isNotBlank()) {
                         val newHabit = Habit(
                             name = habitName,
@@ -131,21 +177,22 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit) {
                             frequencyType = frequencyType
                         )
                         onSaveHabit(newHabit)
+
+                        habitName = ""
+                        habitDescription = ""
+
+
+                        startDate = LocalDate(2025, 1, 1)
+
+
+                        frequencyType = FrequencyType.DAILY
                     }
-
-
                 },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 enabled = habitName.isNotBlank()
-
             ) {
-
                 Text("Save habit")
             }
-
         }
-
     }
-
-
 }
