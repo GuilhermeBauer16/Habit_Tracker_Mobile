@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
@@ -286,6 +287,15 @@ fun DatePickerField(
     isDateOptional: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val clearButtonExclusionTarget = if (isDateOptional && date != null) 48.dp else 0.dp
+    val calendarIconTouchTarget = 48.dp
+
+    val exclusionWidth = if (isDateOptional && date != null) {
+
+        clearButtonExclusionTarget + calendarIconTouchTarget
+    } else {
+        calendarIconTouchTarget
+    }
 
     Box(modifier = modifier.fillMaxWidth()) {
 
@@ -294,26 +304,33 @@ fun DatePickerField(
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
-            modifier = modifier.fillMaxWidth(),
-            trailingIcon = {
-                Text("📅", modifier = Modifier.padding(end = 8.dp))
-
-            }
+            modifier = modifier.fillMaxWidth()
         )
 
-        val clearButtonExclusion = if (isDateOptional && date != null) 48.dp else 0.dp
+
 
         Spacer(
             modifier.matchParentSize()
-                .padding(end = clearButtonExclusion + 48.dp)
+                .padding(end = exclusionWidth)
                 .clickable(onClick = onDateClicked)
         )
+
+        IconButton(
+            onClick = onDateClicked,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(x = if (isDateOptional && date != null) (-48).dp else 0.dp)
+        ) {
+
+            Text("📅")
+
+        }
 
         if (isDateOptional && date != null) {
             IconButton(
                 onClick = onDateCleared,
                 modifier = Modifier.align(Alignment.CenterEnd)
-                    .padding(end = 8.dp)
+
             ) {
                 Text("❌")
             }
