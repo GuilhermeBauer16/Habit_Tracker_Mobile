@@ -93,75 +93,18 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {}) {
             Spacer(modifier = Modifier.height(8.dp))
 
 
-            OutlinedTextField(
-                value = startDate.toString(),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Start date") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-
-                )
-
-
-            Button(
-                onClick = { isStartDatePickerVisible = true },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Abrir calendário")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (isStartDatePickerVisible) {
-                DatePickerDialog(
-                    onDismissRequest = { isStartDatePickerVisible = false },
-                    confirmButton = {
-                        Button(onClick = {
-                            val selectedMillis = datePickerState.selectedDateMillis
-                            if (selectedMillis != null) {
-                                startDate = Instant.fromEpochMilliseconds(selectedMillis)
-                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                            }
-                            isStartDatePickerVisible = false
-                        }) { Text("OK") }
-                    },
-                    dismissButton = {
-                        Button(onClick = { isStartDatePickerVisible = false }) { Text("Cancel") }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
-                }
-            }
-
-
-//            OutlinedTextField(
-//                value = endDate.toString() ?: "",
-//                onValueChange = {},
-//                readOnly = true,
-//                label = {Text("End Date (Optional)")},
-//                modifier = Modifier.fillMaxWidth()
-//                    .clickable(onClick = {isEndDatePickerVisible = true} )
-//                    .padding(bottom = 8.dp),
-//                trailingIcon = {
-//                    Row {
-//                        IconButton(onClick = {}){
-//                            Text("📅")
-//                        }
-//
-//                        if(endDate != null){
-//
-//                            IconButton(onClick = { endDate = null}) {
-//                                Text("❌")
-//                            }
-//                        }
-//                    }
-//                }
-//            )
 
             DatePickerField(
-                label = "End date (Opitional)",
+                label = "Start Date",
+                date = startDate,
+                onDateClicked = { isStartDatePickerVisible = true },
+                onDateCleared = {},
+                isDateOptional = false
+            )
+
+
+            DatePickerField(
+                label = "End date (Optional)",
                 date = endDate,
                 onDateClicked = { isEndDatePickerVisible = true },
                 onDateCleared = { endDate = null },
@@ -170,33 +113,6 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {}) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isEndDatePickerVisible) {
-
-                val initialDateMillis =
-                    endDate?.atStartOfDayIn(TimeZone.currentSystemDefault())?.toEpochMilliseconds()
-                val datePickerState = rememberDatePickerState(
-                    initialSelectedDateMillis = initialDateMillis
-                )
-
-                DatePickerDialog(
-                    onDismissRequest = { isEndDatePickerVisible = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            val selectedMillis = datePickerState.selectedDateMillis
-                            if (selectedMillis != null) {
-                                endDate = Instant.fromEpochMilliseconds(selectedMillis)
-                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                            }
-                            isEndDatePickerVisible = false
-                        }) { Text("OK") }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { isEndDatePickerVisible = false }) { Text("Cancel") }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
-                }
-            }
             ExposedDropdownMenuBox(
                 expanded = isExpanded,
                 onExpandedChange = { isExpanded = it },
@@ -252,7 +168,7 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {}) {
 
 
                         startDate = LocalDate(2025, 1, 1)
-
+                        endDate = null
 
                         frequencyType = FrequencyType.DAILY
                     }
@@ -262,6 +178,14 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {}) {
             ) {
                 Text("Save habit")
             }
+        }
+
+        if(isStartDatePickerVisible){
+            DateSelectionDialog(
+                currentDate = startDate,
+                onDateSelected = {newDate -> startDate = newDate},
+                onDismiss = {isStartDatePickerVisible = false}
+            )
         }
 
         if (isEndDatePickerVisible) {
@@ -362,7 +286,7 @@ fun DateSelectionDialog(
                 if (selectedMillis != null) {
 
                     val newDate = Instant.fromEpochMilliseconds(selectedMillis)
-                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                        .toLocalDateTime(TimeZone.UTC).date
                     onDateSelected(newDate)
                 }
                 onDismiss()
