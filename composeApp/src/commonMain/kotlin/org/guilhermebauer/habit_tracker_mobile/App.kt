@@ -25,6 +25,8 @@ import org.guilhermebauer.habit_tracker_mobile.habit.presentation.NewHabitScreen
 fun App() {
     MaterialTheme {
 
+
+
         NewHabitScreen() {  }
 
     }

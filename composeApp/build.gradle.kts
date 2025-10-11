@@ -44,6 +44,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation("androidx.compose.material:material-icons-extended")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -55,6 +56,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.0-alpha17")
+
 
 
         }
