@@ -39,16 +39,23 @@ import kotlinx.datetime.toLocalDateTime
 import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
 import org.guilhermebauer.habit_tracker_mobile.habit.data.Habit
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlinx.datetime.*
+import org.guilhermebauer.habit_tracker_mobile.utils.formatDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {}) {
+fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {},
+                   onBack: () -> Unit = {}) {
 
     var habitName by remember { mutableStateOf("") }
     var habitDescription by remember { mutableStateOf("") }
-    var startDate by remember { mutableStateOf(LocalDate(2025, 1, 1)) }
+    var startDate by remember { mutableStateOf(
+        Clock.System.now()
+        .toLocalDateTime(
+            TimeZone.currentSystemDefault())
+        .date) }
     var isStartDatePickerVisible by remember { mutableStateOf(false) }
     var isEndDatePickerVisible by remember { mutableStateOf(false) }
     var endDate by remember { mutableStateOf<LocalDate?>(null) }
@@ -58,7 +65,11 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {}) {
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = null)
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Create New Habit") }) }
+        topBar = { TopAppBar(title = { Text("Create New Habit") },
+            navigationIcon = {
+                IconButton(onClick = onBack) { Text("⬅️") } })
+
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -224,7 +235,7 @@ fun DatePickerField(
     Box(modifier = modifier.fillMaxWidth()) {
 
         OutlinedTextField(
-            value = date?.toString() ?: "",
+            value = formatDate(date),
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
