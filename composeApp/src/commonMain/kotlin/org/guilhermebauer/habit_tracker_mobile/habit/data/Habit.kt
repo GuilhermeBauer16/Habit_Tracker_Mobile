@@ -10,6 +10,7 @@ enum class FrequencyType{
     MONTHLY
 }
 @Serializable
+
 data class Habit(
     val name: String ,
     val description: String ,

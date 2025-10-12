@@ -23,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,23 +30,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.datetime.LocalDate
-import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
 import org.guilhermebauer.habit_tracker_mobile.habit.data.Habit
+import org.guilhermebauer.habit_tracker_mobile.utils.formatDate
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun HabitListScreen(onNavigateToNewHabit: () -> Unit) {
+fun HabitListScreen(
+    viewModel: HabitViewModel,
+    onNavigateToNewHabit: () -> Unit,
+    onHabitClick: (Habit) -> Unit
+) {
 
-    val habits = remember {
-        listOf(
-            Habit("Morning Run", "Run 3km every morning", LocalDate(2025, 1, 1), null, frequencyType = FrequencyType.DAILY),
-            Habit("Meditation", "10 minutes mindfulness", LocalDate(2025, 1, 1), null, frequencyType = FrequencyType.DAILY),
-            Habit("Read", "Read 20 pages daily", LocalDate(2025, 1, 1), null, frequencyType = FrequencyType.DAILY)
-        )
-    }
+    val habits = viewModel.habits
+
 
     Scaffold(
 
@@ -58,7 +55,7 @@ fun HabitListScreen(onNavigateToNewHabit: () -> Unit) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
 
-                )
+                    )
 
             )
         },
@@ -111,10 +108,15 @@ fun HabitListScreen(onNavigateToNewHabit: () -> Unit) {
 
                 items(habits) { habit ->
 
-                    HabitCard(habit = habit)
+                    HabitCard(
+                        habit = habit,
+                        onClick = {
+                            viewModel.selectedHabit = habit
+                            onHabitClick(habit)
+
+                        })
                     Spacer(modifier = Modifier.height(12.dp))
                 }
-
 
 
             }
@@ -127,7 +129,7 @@ fun HabitListScreen(onNavigateToNewHabit: () -> Unit) {
 
 
 @Composable
-fun HabitCard(habit: Habit) {
+fun HabitCard(habit: Habit, onClick: () -> Unit) {
 
     Card(
         modifier = Modifier
@@ -137,15 +139,17 @@ fun HabitCard(habit: Habit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        ),
+        onClick = onClick
 
     ) {
 
-        Column(modifier = Modifier.padding(16.dp)){
+        Column(modifier = Modifier.padding(16.dp)) {
 
             Text(
                 text = habit.name,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            )
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -157,7 +161,7 @@ fun HabitCard(habit: Habit) {
             )
 
             Text(
-                text = "Start Date: ${formatDate(habit.startDate)}" ,
+                text = "Start Date: ${formatDate(habit.startDate)}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.DarkGray
 
@@ -170,20 +174,20 @@ fun HabitCard(habit: Habit) {
 
             )
 
+            if (habit.endDate != null) {
 
+                Text(
+                    text = "End Date: ${formatDate(habit.endDate)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.DarkGray
+
+                )
+
+
+            }
         }
+
+
     }
-
-
 }
 
-fun formatDate( date: LocalDate): String{
-
-    val day = date.dayOfMonth.toString().padStart(2, '0')
-    val month = date.monthNumber.toString().padStart(2, '0')
-    val year = date.year.toString()
-
-    return "$day/$month/$year"
-
-
-}

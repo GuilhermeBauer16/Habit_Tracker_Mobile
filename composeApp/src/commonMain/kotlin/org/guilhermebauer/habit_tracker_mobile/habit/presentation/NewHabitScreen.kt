@@ -17,11 +17,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -38,24 +41,29 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
 import org.guilhermebauer.habit_tracker_mobile.habit.data.Habit
-import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlinx.datetime.*
 import org.guilhermebauer.habit_tracker_mobile.utils.formatDate
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {},
-                   onBack: () -> Unit = {}) {
+fun NewHabitScreen(
+    onSaveHabit: (Habit) -> Unit = {},
+    onBack: () -> Unit = {}
+) {
 
     var habitName by remember { mutableStateOf("") }
     var habitDescription by remember { mutableStateOf("") }
-    var startDate by remember { mutableStateOf(
-        Clock.System.now()
-        .toLocalDateTime(
-            TimeZone.currentSystemDefault())
-        .date) }
+    var startDate by remember {
+        mutableStateOf(
+            Clock.System.now()
+                .toLocalDateTime(
+                    TimeZone.currentSystemDefault()
+                )
+                .date
+        )
+    }
     var isStartDatePickerVisible by remember { mutableStateOf(false) }
     var isEndDatePickerVisible by remember { mutableStateOf(false) }
     var endDate by remember { mutableStateOf<LocalDate?>(null) }
@@ -65,9 +73,17 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {},
     val datePickerState = rememberDatePickerState(initialSelectedDateMillis = null)
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Create New Habit") },
-            navigationIcon = {
-                IconButton(onClick = onBack) { Text("⬅️") } })
+        topBar = {
+            TopAppBar(
+                title = { Text("New Habit") },
+
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                navigationIcon = {
+                    IconButton(onClick = onBack) { Text("⬅️") }
+                })
 
         }
     ) { paddingValues ->
@@ -185,17 +201,17 @@ fun NewHabitScreen(onSaveHabit: (Habit) -> Unit = {},
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
-                enabled = habitName.isNotBlank()
+                enabled = habitName.isNotBlank(),
             ) {
                 Text("Save habit")
             }
         }
 
-        if(isStartDatePickerVisible){
+        if (isStartDatePickerVisible) {
             DateSelectionDialog(
                 currentDate = startDate,
-                onDateSelected = {newDate -> startDate = newDate},
-                onDismiss = {isStartDatePickerVisible = false}
+                onDateSelected = { newDate -> startDate = newDate },
+                onDismiss = { isStartDatePickerVisible = false }
             )
         }
 
