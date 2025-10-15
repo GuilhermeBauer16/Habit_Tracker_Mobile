@@ -7,18 +7,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -30,9 +36,16 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun HabitDetailsScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
+fun HabitDetailsScreen(
+    viewModel: HabitViewModel,
+    onBack: () -> Unit,
+    onEdit: (Habit) -> Unit
+) {
 
     val habit = viewModel.selectedHabit ?: return
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -43,8 +56,24 @@ fun HabitDetailsScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                 ),
                 navigationIcon = {
 
-                    IconButton(onClick = onBack){
+                    IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                    }
+
+                    IconButton(onClick = {
+                        showDeleteDialog = true
+                    }) {
+                        Icon(
+                            Icons.Default.Delete, contentDescription = "Delete",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        onBack
+                    }
+
+                },
+                actions = {
+                    IconButton(onClick = { onEdit(habit) }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit")
                     }
                 }
             )
@@ -81,4 +110,38 @@ fun HabitDetailsScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
             Text("🔁 Frequency: ${habit.frequencyType.name.lowercase()}")
         }
     }
+
+    if (showDeleteDialog) {
+
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Habit") },
+            text = { Text("Are you sure you want to delete this habit?") },
+            confirmButton = {
+
+                TextButton(onClick = {
+
+                    viewModel.deleteHabit(habit)
+                    showDeleteDialog = false
+                    onBack()
+
+
+                }
+                ) {
+                    Text(
+                        "Delete", color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        )
+    }
 }
+
+

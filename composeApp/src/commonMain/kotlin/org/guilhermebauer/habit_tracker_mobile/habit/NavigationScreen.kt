@@ -6,6 +6,8 @@ sealed class Screen(val route: String){
     object NewHabit : Screen("new_habit")
     object HabitDetails : Screen("habit_details")
 
+    object HabitEdit : Screen("habit_edit")
+
 
 }
 
