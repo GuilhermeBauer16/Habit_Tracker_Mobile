@@ -60,6 +60,14 @@ fun HabitDetailsScreen(
                         Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
                     }
 
+
+
+                },
+                actions = {
+                    IconButton(onClick = { onEdit(habit) }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                    }
+
                     IconButton(onClick = {
                         showDeleteDialog = true
                     }) {
@@ -68,12 +76,6 @@ fun HabitDetailsScreen(
                             tint = MaterialTheme.colorScheme.error
                         )
                         onBack
-                    }
-
-                },
-                actions = {
-                    IconButton(onClick = { onEdit(habit) }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
                     }
                 }
             )
@@ -88,6 +90,11 @@ fun HabitDetailsScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
+            Text("Name", fontWeight = FontWeight.Bold)
+            Text(habit.name)
+
+            Spacer(Modifier.height(12.dp))
+
             Text("📝 Description", fontWeight = FontWeight.Bold)
             Text(habit.description.ifEmpty { "No description provided." })
 
