@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
+import org.guilhermebauer.habit_tracker_mobile.utils.DatePickerField
+import org.guilhermebauer.habit_tracker_mobile.utils.DateSelectionDialog
 import org.guilhermebauer.habit_tracker_mobile.utils.formatDate
 
 @Composable
@@ -46,6 +48,9 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
     var isExpanded by remember { mutableStateOf(false) }
     val frequencyOptions = FrequencyType.entries.toList()
     var showError by remember { mutableStateOf(false) }
+
+    var isStartDatePickerVisible by remember { mutableStateOf(false) }
+    var isEndDatePickerVisible by remember { mutableStateOf(false) }
 
 
     Scaffold(
@@ -115,9 +120,20 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                 minLines = 2
             )
 
-            Text(
-                "Start Date: ${formatDate(startDate)}",
-                fontWeight = FontWeight.SemiBold
+            DatePickerField(
+                label = "Start Date",
+                date = startDate,
+                onDateClicked = { isStartDatePickerVisible = true },
+                onDateCleared = {},
+                isDateOptional = false
+            )
+
+            DatePickerField(
+                label = "End date (Optional)",
+                date = endDate,
+                onDateClicked = { isEndDatePickerVisible = true },
+                onDateCleared = { endDate = null },
+                isDateOptional = true
             )
 
             Text(
@@ -167,6 +183,22 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold
             )
+
+            if (isStartDatePickerVisible) {
+                DateSelectionDialog(
+                    currentDate = startDate,
+                    onDateSelected = { newDate -> startDate = newDate },
+                    onDismiss = { isStartDatePickerVisible = false }
+                )
+            }
+
+            if (isEndDatePickerVisible) {
+                DateSelectionDialog(
+                    currentDate = endDate,
+                    onDateSelected = { newDate -> endDate = newDate },
+                    onDismiss = { isEndDatePickerVisible = false }
+                )
+            }
 
 
         }
