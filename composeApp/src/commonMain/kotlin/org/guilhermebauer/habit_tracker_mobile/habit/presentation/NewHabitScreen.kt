@@ -1,16 +1,25 @@
 package org.guilhermebauer.habit_tracker_mobile.habit.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -23,8 +32,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -74,7 +83,9 @@ fun NewHabitScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Text("⬅️") }
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                    }
                 })
 
         }
@@ -82,10 +93,17 @@ fun NewHabitScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+
+            Text(
+                "🧩 Habit Information",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
 
             OutlinedTextField(
                 value = habitName,
@@ -94,7 +112,6 @@ fun NewHabitScreen(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
             )
 
             OutlinedTextField(
@@ -106,12 +123,15 @@ fun NewHabitScreen(
                 maxLines = 5,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
 
-
+            Text(
+                "📅 Schedule",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
 
 
             DatePickerField(
@@ -131,7 +151,7 @@ fun NewHabitScreen(
                 isDateOptional = true
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+//            Spacer(modifier = Modifier.height(16.dp))
 
             ExposedDropdownMenuBox(
                 expanded = isExpanded,
@@ -169,7 +189,7 @@ fun NewHabitScreen(
                 }
             }
 
-            Spacer(Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(18.dp))
 
             Button(
                 onClick = {
@@ -182,21 +202,20 @@ fun NewHabitScreen(
                             frequencyType = frequencyType
                         )
                         onSaveHabit(newHabit)
+                        onBack()
 
-                        habitName = ""
-                        habitDescription = ""
-
-
-                        startDate = LocalDate(2025, 1, 1)
-                        endDate = null
-
-                        frequencyType = FrequencyType.DAILY
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                modifier = Modifier.fillMaxWidth()
+                    .height(56.dp),
+                shape= MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 enabled = habitName.isNotBlank(),
             ) {
-                Text("Save habit")
+                Text("Save habit", style = MaterialTheme.typography.titleMedium)
             }
         }
 
