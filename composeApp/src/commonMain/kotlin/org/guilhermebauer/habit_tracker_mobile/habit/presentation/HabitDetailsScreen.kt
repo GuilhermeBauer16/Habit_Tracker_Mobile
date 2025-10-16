@@ -1,16 +1,18 @@
 package org.guilhermebauer.habit_tracker_mobile.habit.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,7 +51,12 @@ fun HabitDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Habit Details") },
+                title = {
+                    Text(
+                        "Habit Details",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -57,15 +64,22 @@ fun HabitDetailsScreen(
                 navigationIcon = {
 
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
-
 
 
                 },
                 actions = {
                     IconButton(onClick = { onEdit(habit) }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = MaterialTheme.colorScheme.tertiary
+                        )
                     }
 
                     IconButton(onClick = {
@@ -85,36 +99,36 @@ fun HabitDetailsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f))
                 .padding(paddingValues)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Name", fontWeight = FontWeight.Bold)
-            Text(habit.name)
 
-            Spacer(Modifier.height(12.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
 
-            Text("📝 Description", fontWeight = FontWeight.Bold)
-            Text(habit.description.ifEmpty { "No description provided." })
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
 
-            Spacer(Modifier.height(12.dp))
+                    DetailRow("📛 Name", habit.name)
+                    DetailRow(
+                        "📝 Description",
+                        habit.description.ifEmpty { "No description provided." })
+                    DetailRow("📅 Start Date", formatDate(habit.startDate))
+                    DetailRow("🏁 End Date", habit.endDate?.let { formatDate(it) } ?: "Not defined")
+                    DetailRow("🔁 Frequency", habit.frequencyType.name.lowercase())
+                }
 
-            Text("📅 Start Date: ${formatDate(habit.startDate)}")
-
-            Spacer(Modifier.height(12.dp))
-
-            if (habit.endDate != null) {
-
-                Text("🏁 End Date: ${formatDate(habit.endDate)}")
-            } else {
-
-                Text("🏁 End Date: Not defined")
             }
-
-            Spacer(Modifier.height(12.dp))
-
-            Text("🔁 Frequency: ${habit.frequencyType.name.lowercase()}")
         }
     }
 
@@ -147,6 +161,24 @@ fun HabitDetailsScreen(
                     Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
+        )
+    }
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+
+    Column {
+        Text(
+            label,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Text(
+            value,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

@@ -7,32 +7,41 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
 import org.guilhermebauer.habit_tracker_mobile.utils.DatePickerField
 import org.guilhermebauer.habit_tracker_mobile.utils.DateSelectionDialog
-import org.guilhermebauer.habit_tracker_mobile.utils.formatDate
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,15 +60,33 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
 
     var isStartDatePickerVisible by remember { mutableStateOf(false) }
     var isEndDatePickerVisible by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
+
 
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Habit") },
+                title = {
+                    Text(
+                        "Edit Habit",
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+
+                },
+
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
                 },
                 actions = {
@@ -80,21 +107,58 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                             onBack()
                         }
                     }) {
-                        Icon(Icons.Default.Check, contentDescription = "Save")
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = "Save",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
                 }
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
     ) { paddingValues ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
 
         ) {
+
+
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+                    .shadow(1.dp, RoundedCornerShape(12.dp))
+
+
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+
+
+                ) {
+
+                    Text(
+                        "Habit Details",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+
+                }
+            }
+
+
 
 
             OutlinedTextField(
@@ -103,12 +167,21 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                 label = { Text("Name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                isError = showError && name.isBlank()
+                isError = showError && name.isBlank(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
 
+
+                    )
             )
 
             if (showError && name.isBlank()) {
-                Text("Name cannot be empty", color = MaterialTheme.colorScheme.error)
+                Text(
+                    "Name cannot be empty",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
 
 
@@ -117,8 +190,16 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                 onValueChange = { description = it },
                 label = { Text("Description") },
                 modifier = Modifier.fillMaxWidth(),
-                minLines = 2
+                minLines = 3,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+
+
+                    )
             )
+
+            HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
 
             DatePickerField(
                 label = "Start Date",
@@ -134,11 +215,6 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                 onDateClicked = { isEndDatePickerVisible = true },
                 onDateCleared = { endDate = null },
                 isDateOptional = true
-            )
-
-            Text(
-                "End Date: ${endDate?.let { formatDate(it) } ?: "Not defined"}",
-                fontWeight = FontWeight.SemiBold
             )
 
             ExposedDropdownMenuBox(
@@ -175,14 +251,17 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(24.dp))
 
             Text(
-                "Changes will saved when you tap the ✓ icon.",
+                "Tap ✓ to save your changes.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold
+                color = MaterialTheme.colorScheme.secondary,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
+
+
 
             if (isStartDatePickerVisible) {
                 DateSelectionDialog(
