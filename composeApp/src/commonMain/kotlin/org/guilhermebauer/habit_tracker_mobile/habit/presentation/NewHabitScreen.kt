@@ -203,8 +203,7 @@ fun NewHabitScreen(
                             description = habitDescription,
                             startDate = startDate,
                             endDate = endDate,
-                            frequencyType = frequencyType,
-                            id = TODO()
+                            frequencyType = frequencyType
                         )
                         coroutineScope.launch {
                             viewModel.addHabit(newHabit)
