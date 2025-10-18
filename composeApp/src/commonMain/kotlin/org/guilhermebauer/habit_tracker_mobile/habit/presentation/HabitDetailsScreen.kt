@@ -146,7 +146,7 @@ fun HabitDetailsScreen(
 
                 TextButton(onClick = {
                     coroutineScope.launch {
-                        viewModel.deleteHabit(habit.name)
+                        viewModel.deleteHabit(habit.id)
                         showDeleteDialog = false
                         onBack()
                     }

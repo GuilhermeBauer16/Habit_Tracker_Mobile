@@ -46,12 +46,13 @@ class HabitViewModel : ViewModel() {
     }
 
 
-    suspend fun updateHabit(updated: Habit) {
+    suspend fun updateHabit(updatedHabit: Habit) {
 
 
         try {
-            api.updateHabit(updated)
+            api.updateHabit(updatedHabit)
             loadHabits()
+            selectedHabit = updatedHabit
         } catch (e: Exception) {
             println("Error updating habit: ${e.message}")
         }
