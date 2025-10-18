@@ -31,10 +31,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -50,6 +53,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun NewHabitScreen(
+    viewModel: HabitViewModel = HabitViewModel(),
     onSaveHabit: (Habit) -> Unit = {},
     onBack: () -> Unit = {}
 ) {
@@ -71,7 +75,7 @@ fun NewHabitScreen(
     var frequencyType by remember { mutableStateOf(FrequencyType.DAILY) }
     var isExpanded by remember { mutableStateOf(false) }
     val frequencyOptions = FrequencyType.entries.toList()
-
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -199,8 +203,14 @@ fun NewHabitScreen(
                             description = habitDescription,
                             startDate = startDate,
                             endDate = endDate,
-                            frequencyType = frequencyType
+                            frequencyType = frequencyType,
+                            id = TODO()
                         )
+                        coroutineScope.launch {
+                            viewModel.addHabit(newHabit)
+
+                        }
+
                         onSaveHabit(newHabit)
                         onBack()
 

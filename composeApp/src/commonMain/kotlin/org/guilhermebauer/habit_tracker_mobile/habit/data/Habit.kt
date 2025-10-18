@@ -3,6 +3,8 @@ package org.guilhermebauer.habit_tracker_mobile.habit.data
 
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
+
+@Serializable
 enum class FrequencyType{
 
     DAILY,
@@ -10,8 +12,8 @@ enum class FrequencyType{
     MONTHLY
 }
 @Serializable
-
 data class Habit(
+    val id: String = "",
     val name: String ,
     val description: String ,
     val startDate: LocalDate,

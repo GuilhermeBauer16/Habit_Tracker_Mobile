@@ -1,39 +1,76 @@
 package org.guilhermebauer.habit_tracker_mobile.habit.presentation
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import kotlinx.datetime.LocalDate
-import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import org.guilhermebauer.habit_tracker_mobile.habit.data.Habit
+import org.guilhermebauer.habit_tracker_mobile.habit.data.KtorClientProvider
+
 class HabitViewModel : ViewModel() {
 
-    var habits by mutableStateOf(
-        mutableListOf(
-            Habit("Morning Run", "Run 3km every morning", LocalDate(2025, 1, 1), null, FrequencyType.DAILY),
-            Habit("Meditation", "10 minutes mindfulness", LocalDate(2025, 1, 2), null, FrequencyType.DAILY),
-            Habit("Read", "Read 20 pages", LocalDate(2025, 1, 3), null, FrequencyType.DAILY)
-        ))
+    private val api = KtorClientProvider.habitApi
+
+    var habits by mutableStateOf<List<Habit>>(emptyList())
+        private set
+    var selectedHabit by mutableStateOf<Habit?>(null)
 
 
+    fun loadHabits() {
 
+        viewModelScope.launch {
 
-        var selectedHabit by mutableStateOf<Habit?>(null)
+            try {
+                habits = api.getAllHabits()
+                println("loaded: ${habits.size}")
+            } catch (e: Exception) {
+                println("Error loading habits: ${e.message}")
 
-    fun updateHabit(updated: Habit) {
-        habits = habits.map {
-            if (it.name == selectedHabit?.name) updated else it
+            }
+
         }
-            .toMutableList()
+    }
 
-        selectedHabit = updated
+    suspend fun addHabit(habit: Habit) {
+
+        try {
+            api.createHabit(habit)
+            loadHabits()
+        } catch (e: Exception) {
+            println("Error adding habit: ${e.message}")
+
+        }
 
     }
 
 
-    fun deleteHabit(habit: Habit){
-        habits = habits.filter { it.name != habit.name }.toMutableList()
+    suspend fun updateHabit(updated: Habit) {
 
-        selectedHabit = null
+
+        try {
+            api.updateHabit(updated)
+            loadHabits()
+        } catch (e: Exception) {
+            println("Error updating habit: ${e.message}")
+        }
+
+
+    }
+
+
+    suspend fun deleteHabit(id: String) {
+
+
+        try {
+            api.deleteHabit(id)
+            loadHabits()
+        } catch (e: Exception) {
+            println("Error deleting habit: ${e.message}")
+        }
+
+
     }
 
 }

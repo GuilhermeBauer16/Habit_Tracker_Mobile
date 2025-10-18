@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "1.9.0"
 
 }
 
@@ -60,8 +61,12 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.0-alpha17")
-
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.2")
+
+            implementation("io.ktor:ktor-client-core:3.3.1")
+            implementation("io.ktor:ktor-client-content-negotiation:3.3.1")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
+            implementation("io.ktor:ktor-client-cio:3.3.1")
 
 
 

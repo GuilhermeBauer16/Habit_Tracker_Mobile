@@ -33,12 +33,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.guilhermebauer.habit_tracker_mobile.habit.data.FrequencyType
 import org.guilhermebauer.habit_tracker_mobile.utils.DatePickerField
 import org.guilhermebauer.habit_tracker_mobile.utils.DateSelectionDialog
@@ -61,6 +63,8 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
     var isStartDatePickerVisible by remember { mutableStateOf(false) }
     var isEndDatePickerVisible by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+
+    val coroutineScope = rememberCoroutineScope()
 
 
 
@@ -95,16 +99,18 @@ fun HabitEditScreen(viewModel: HabitViewModel, onBack: () -> Unit) {
                         if (name.isBlank()) {
                             showError = true
                         } else {
-                            viewModel.updateHabit(
-                                habit.copy(
-                                    name = name.trim(),
-                                    description = description.trim(),
-                                    frequencyType = frequencyType,
-                                    startDate = startDate,
-                                    endDate = endDate
+                            coroutineScope.launch {
+                                viewModel.updateHabit(
+                                    habit.copy(
+                                        name = name.trim(),
+                                        description = description.trim(),
+                                        frequencyType = frequencyType,
+                                        startDate = startDate,
+                                        endDate = endDate
+                                    )
                                 )
-                            )
-                            onBack()
+                                onBack()
+                            }
                         }
                     }) {
                         Icon(

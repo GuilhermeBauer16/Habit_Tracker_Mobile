@@ -13,6 +13,10 @@ pluginManagement {
         mavenCentral()
 
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven(
+            url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
+        )
+
 
         gradlePluginPortal()
     }
@@ -30,6 +34,13 @@ dependencyResolutionManagement {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://androidx.dev/storage/compose-compiler/repository/")
+
+
+        maven(
+            url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        )
+
+
     }
 }
 

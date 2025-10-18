@@ -26,11 +26,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.guilhermebauer.habit_tracker_mobile.habit.data.Habit
 import org.guilhermebauer.habit_tracker_mobile.utils.formatDate
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -47,6 +49,8 @@ fun HabitDetailsScreen(
     val habit = viewModel.selectedHabit ?: return
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
 
     Scaffold(
         topBar = {
@@ -141,11 +145,11 @@ fun HabitDetailsScreen(
             confirmButton = {
 
                 TextButton(onClick = {
-
-                    viewModel.deleteHabit(habit)
-                    showDeleteDialog = false
-                    onBack()
-
+                    coroutineScope.launch {
+                        viewModel.deleteHabit(habit.name)
+                        showDeleteDialog = false
+                        onBack()
+                    }
 
                 }
                 ) {
