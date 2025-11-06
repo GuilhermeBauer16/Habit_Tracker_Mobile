@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,7 +26,12 @@ import org.guilhermebauer.habit_tracker_mobile.habit.presentation.NewHabitScreen
 fun App() {
     MaterialTheme {
 
-        NewHabitScreen() {  }
+        Surface(modifier = Modifier){
+
+            AppNavigation()
+        }
+
+
 
     }
 }
